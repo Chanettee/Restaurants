@@ -16,176 +16,123 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
         integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <link rel="stylesheet" href="fa/css/font-awesome.min.css">
-
 </head>
 
-<body>
+<style>
+    .bg {
+        background-color: #f2eddd;
+        margin: 40px 20px;
+    }
+</style>
+
+<body class="bg">
+    <h4 class="text-center">Charissa food Items</h4>
+    <br>
     <div class="container">
+        <div class="col-md-12 mx-auto">
+        <form class="row" >
+            <br>
+            <div class="col-3">
+                <input type="number" class="form-control" placeholder="ID" id="listid">
+            </div>
 
-        <div>
-            <table class="table">
-                <thead>
-                    <tr>
+            <div class="col-4">
+                <input type="text" class="form-control" placeholder="Name" id="listname">
+            </div>
 
-                        <td colspan=2>
-                            <input type="hidden" name="" id="txtRID" value="0" />
-                            <input type="password" class="form-control" id="txtUnique" placeholder="Unique Name" />
+            <div class="col-3">
+                <input type="number" class="form-control" placeholder="Price" id="listprice">
+            </div>
 
-                        </td>
-                        <td><input type="text" class="form-control" id="txtName" placeholder="Name" /></td>
-                        <td><input type="text" class="form-control" id="txtOwner" placeholder="Owner" /></td>
-                        <td><input type="text" class="form-control" id="txtWebSite" placeholder="WebSite" /></td>
-                        <td><button class="btn btn-primary" id="btnAdd"> <i class="fa fa-plus-circle"
-                                    aria-hidden="true"></i> Add </button></td>
-
-                    </tr>
-                    <tr>
-                        <th></th>
-                        <th>ID</th>
-                        <th>Name</th>
-                        <th>Owner</th>
-                        <th>Website</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-                <tbody id="tblRestaurants"></tbody>
-            </table>
-        </div>
-
-
-        <select id="optCate" class="form-control">
-            <option value="1"> Hello </option>
-        </select>
+            <div class="col-2">
+                <button type="button" class="btn btn-primary" id='btnAdd'><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-circle" viewBox="0 0 16 16">
+                    <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                    <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+                </svg>  Add</button>
+            </div>
+        </form>
     </div>
 
-
-
-
-
+    <div class="container">
+        <table id="tblAll" class="table table-striped" style="margin-top:23px">
+            <thead>
+                <tr>
+                    <th>รหัสอาหาร :</th>
+                    <th>เมนูอาหาร :</th>
+                    <th>ราคาอาหาร :</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+        <br />
+    </div>
+    </div>
 </body>
+
 <script>
-    function loadCate() {
-        var url = "https://cjundang.me/api/category/gets";
-        $.getJSON(url)
-            .done((data) => {
-                var line = "";
-                $.each(data, (k, v) => {
-                    line += "<option value='" + v.cid + "'> " + v.categories + "</option>";
-                });
-                $("#optCate").empty();
-                $("#optCate").append(line);
+    $(function () {
+        $('#btnAdd').on('click', function () {
+            var listid, listname, listprice;
+            listid = $("#listid").val();
+            listname = $("#listname").val();
+            listprice = $("#listprice").val();
+            var edit = "<a class='edit' href='JavaScript:void(1);' >Edit</a>";
+            var del = "<a class='delete' href='JavaScript:void(1);'>Delete</a>";
+            if (listid == "" || listname == "" || listprice == " ") {
+                alert("กรุณากรอกข้อมูลให้ครบถ้วน");
+            } else {
+                var table = "<tr><td>" + listid + "</td><td>" + listname + "</td><td>" + listprice + "</td><td>" + edit + "</td><td>" + del + "</td></tr>";
+                $("#tblAll").append(table);
+            }
+            listid = $("#listid").val("");
+            listname = $("#listname").val("");
+            listprice = $("#listprice").val("");
+            Clear();
+        });
+    });
 
-            })
+    $('#btnUpdate').on('click', function () {
+        var listid, listname, listprice;
+        listid = $("#listid").val();
+        listname = $("#listname").val();
+        listprice = $("#listprice").val();
+        $('#tblAll tbody tr').eq($('#hfRowIndex').val()).find('td').eq(0).html(listid);
+        $('#tblAll tbody tr').eq($('#hfRowIndex').val()).find('td').eq(1).html(listname);
+        $('#tblAll tbody tr').eq($('#hfRowIndex').val()).find('td').eq(2).html(listprice);
+        $('#btnAdd').show();
+        $('#btnUpdate').hide();
+        Clear();
+    });
 
-    }
-    function loadRestaurants() {
-        var url = "https://cjundang.me/api/restaurants/gets";
-        $.getJSON(url).done((data) => {
-            var line = "";
-            console.log(data);
-            $.each(data, (key, item) => {
-                line += "<tr>";
-                line += "<td> <a class='btn btn-danger btn-sm' href='#' onClick='deleRestaurant(" + item.rid + ")'><i class='fa fa-trash' aria-hidden='true'></i> dele </a> ";
-                line += "<a class='btn btn-primary  btn-sm' href='#' onClick='loadARestaurant(" + item.rid + ")' > <i class='fa fa-pencil-square-o' aria-hidden='true'></i> edit </a></td>";
-                line += "<td>" + item.rid + "</td>";
-                line += "<td>" + item.name + "</td>";
-                line += "<td>" + item.owner_name + "</td>";
-                line += "<td>  <a href='" + item.website + "'> Link </a></td>";
-                line += "<td>";
-                line += "Opened </td>";
-                line += "</tr>";
-                console.log(line);
-
-
-            });
-            $("#tblRestaurants").empty();
-            $("#tblRestaurants").append(line);
-
-        })
-            .fail((xhr, status, error) => {
-
-            });
-    }
-
-    function loadARestaurant(id) {
-        var url = "https://cjundang.me/api/restaurants/get/" + id;
-        $.getJSON(url).done((data) => {
-            console.log(data);
-            var item = data[0];
-            $("#txtRID").val(item.rid);
-            $("#txtName").val(item.name);
-            $("#txtOwner").val(item.owner_name);
-            $("#txtWebSite").val(item.website);
-
-
-        })
-            .fail((xhr, status, error) => {
-
-            });
-    }
-
-    function deleRestaurant(id) {
-
-        var unique_name = prompt("confirm to delete with Uniqe Name");
-        if (unique_name != null) {
-            var data = new Object();
-            data.unique_name = unique_name;
-            data.rstatus = 1;
-            var url = "https://cjundang.me/api/restaurants/status";
-            $.post(
-                url,
-                { "data": JSON.stringify(data) },
-                (data, status) => {
-                    console.log(data + " " + status);
-                    loadRestaurants();
-                }
-            )
-        }
-
-
-    }
-
-    function addRestaurant() {
-        var data = new Object();
-        data.unique_name = $("#txtUnique").val();
-        data.name = $("#txtName").val();
-        data.owner_name = $("#txtOwner").val();
-        data.website = $("#txtWebSite").val();
-        console.log(JSON.stringify(data));
-        var rid = parseInt($("#txtRID").val());
-
-        if (rid == 0) {  // add
-            var url = "https://cjundang.me/api/restaurants/add";
-            $.post(
-                url,
-                {
-                    "data": JSON.stringify(data)
-                },
-                (data, status) => {
-                    console.log(data + " " + status);
-                    loadRestaurants();
-                }
-            );
+    $("#tblAll").on("click", ".delete", function (e) {
+        if (confirm("ยืนยันการลบ")) {
+            $(this).closest('tr').remove();
         } else {
-            var url = "https://cjundang.me/api/restaurants/update";
-            $.post(
-                url,
-                {
-                    "data": JSON.stringify(data)
-                },
-                (data, status) => {
-                    console.log(data + " " + status);
-                    loadRestaurants();
-                }
-            );
+            e.preventDefault();
         }
-    }
+    });
 
-    $(() => {
-        loadRestaurants();
-        loadCate();
-        $("#btnAdd").click(addRestaurant);
-    })
+    $('#btnClear').on('click', function () {
+        Clear();
+    });
+
+    $("#tblAll").on("click", ".edit", function (e) {
+        var row = $(this).closest('tr');
+        var td = $(row).find("td");
+        $('#listname').val($(td).eq(0).html());
+        $('#listid').val($(td).eq(1).html());
+        $('#listprice').val($(td).eq(2).html());
+        $('#btnAdd').show();
+        $('#btnUpdate').show();
+    });
+
+    function Clear() {
+        $("#listname").val("");
+        $("#listid").val("");
+        $("#listprice").val("");
+    }
 </script>
+
 
 </html>
